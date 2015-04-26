@@ -1,7 +1,4 @@
-#!/usr/bin/env ruby
-
 require 'wiringpi'
-require 'sinatra'
 
 module Garage
   extend self
@@ -30,8 +27,4 @@ module Garage
   def status_of_door(num)
     status_from_value value_of_door(num)
   end
-end
-
-get '/door/:id' do
-  Garage.status_of_door(params[:id].to_i).to_s
 end
