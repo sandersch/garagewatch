@@ -1,4 +1,5 @@
 require 'wiringpi'
+require 'json'
 
 module Garage
   DOOR_PIN = {
@@ -33,6 +34,13 @@ module Garage
       else
         :open
       end
+    end
+
+    def to_json
+      {
+        id: id,
+        status: status,
+      }.to_json
     end
   end
 end

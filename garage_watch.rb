@@ -3,8 +3,13 @@
 require 'sinatra'
 require_relative './garage'
 
+
 class GarageWatch < Sinatra::Application
+  before do
+    content_type :json
+  end
+
   get '/door/:id' do
-    Garage.door(params[:id]).status.to_s
+    Garage.door(params[:id]).to_json
   end
 end
