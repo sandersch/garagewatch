@@ -1,30 +1,38 @@
 require 'wiringpi'
 
 module Garage
-  extend self
-
   DOOR_PIN = {
     1 => 5,
     2 => 4, 
   }
 
-  def gpio
+  def self.gpio
     @gpio ||= WiringPi::GPIO.new
   end
 
-  def value_of_door(num)
-    gpio.digital_read DOOR_PIN.fetch(num)
+  def self.door(id)
+    Door.new id, gpio, DOOR_PIN.fetch(id.to_i)
   end
 
-  def status_from_value(value)
-    if value == 1
-      :closed
-    else
-      :open
+  class Door
+    def initialize(id, gpio, pin)
+      @id   = id
+      @gpio = gpio
+      @pin  = pin
     end
-  end
 
-  def status_of_door(num)
-    status_from_value value_of_door(num)
+    attr_reader :id, :pin, :gpio
+
+    def value
+      gpio.digital_read pin
+    end
+
+    def status
+      if value == 1
+        :closed
+      else
+        :open
+      end
+    end
   end
 end
