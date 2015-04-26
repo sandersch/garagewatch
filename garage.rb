@@ -15,6 +15,14 @@ module Garage
     Door.new id, gpio, DOOR_PIN.fetch(id.to_i)
   end
 
+  def self.status
+    {
+      doors: DOOR_PIN.map do |(id, pin)|
+        Door.new(id, gpio, pin)
+      end
+    }
+  end
+
   class Door
     def initialize(id, gpio, pin)
       @id   = id
@@ -36,7 +44,7 @@ module Garage
       end
     end
 
-    def to_json
+    def to_json(*)
       {
         id: id,
         status: status,

@@ -12,4 +12,8 @@ class GarageWatch < Sinatra::Application
   get '/door/:id' do
     Garage.door(params[:id]).to_json
   end
+
+  get '/doors' do
+    Garage.status.to_json
+  end
 end
