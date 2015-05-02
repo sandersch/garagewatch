@@ -16,4 +16,10 @@ class GarageWatch < Sinatra::Application
   get '/doors' do
     Garage.status.to_json
   end
+
+  put '/door/:id' do
+    payload = JSON.parse(request.body.read)
+
+    Garage.door(params[:id]).update(payload['position'])
+  end
 end

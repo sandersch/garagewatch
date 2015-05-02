@@ -3,8 +3,8 @@ require 'json'
 
 module Garage
   DOOR_PIN = {
-    1 => 5,
-    2 => 4, 
+    1 => { in: 5, out: 3 },
+    2 => { in: 4, out: 0 },
   }
 
   def self.gpio
@@ -17,23 +17,24 @@ module Garage
 
   def self.status
     {
-      doors: DOOR_PIN.map do |(id, pin)|
-        Door.new(id, gpio, pin)
+      doors: DOOR_PIN.map do |(id, pins)|
+        Door.new(id, gpio, pins)
       end
     }
   end
 
   class Door
-    def initialize(id, gpio, pin)
-      @id   = id
-      @gpio = gpio
-      @pin  = pin
+    def initialize(id, gpio, pins)
+      @id      = id
+      @gpio    = gpio
+      @in_pin  = pins.fetch(:in)
+      @out_pin = pins.fetch(:out)
     end
 
-    attr_reader :id, :pin, :gpio
+    attr_reader :id, :in_pin, :out_pin, :gpio
 
     def value
-      gpio.digital_read pin
+      gpio.digital_read in_pin
     end
 
     def status
@@ -45,10 +46,70 @@ module Garage
     end
 
     def to_json(*)
+      to_hash.to_json
+    end
+
+    def to_hash(*)
       {
         id: id,
         status: status,
-      }.to_json
+      }
+    end
+
+    def update(position)
+      validator = PositionValidator.new(position)
+
+      if validator.valid?
+        new_status = set(position)
+
+        [ 200, to_hash.merge(status: new_status).to_json ]
+      else
+        [ 422, { errors: validator.errors }.to_json ]
+      end
+    end
+
+    private
+
+    def move
+      gpio.pin_mode out_pin, WiringPi::OUTPUT
+      sleep 0.25
+      gpio.pin_mode out_pin, WiringPi::INPUT
+    end
+
+    def set(position)
+      if status.to_s == position
+        status
+      else
+        move
+        :moving
+      end
+    end
+
+  end
+
+  class PositionValidator
+    VALID_POSITIONS = ['open','closed']
+
+    def initialize(position)
+      @position = position
+    end
+
+    attr_reader :position, :errors
+
+    def validate
+      @errors = []
+      validate_recognized_position
+      @errors
+    end
+
+    def validate_recognized_position
+      unless VALID_POSITIONS.include? position.to_s
+        @errors << { :position => "not in #{VALID_POSITIONS.join(', ')}" }
+      end
+    end
+
+    def valid?
+      validate && errors.none?
     end
   end
 end
