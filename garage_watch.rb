@@ -18,8 +18,12 @@ class GarageWatch < Sinatra::Application
   end
 
   put '/door/:id' do
-    payload = JSON.parse(request.body.read)
+    begin
+      payload = JSON.parse(request.body.read)
 
-    Garage.door(params[:id]).update(payload['position'])
+      Garage.door(params[:id]).update(payload['position'])
+    rescue JSON::ParserError => e
+      [ 400 ]
+    end
   end
 end
