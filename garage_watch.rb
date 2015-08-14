@@ -8,6 +8,7 @@ class GarageWatch < Sinatra::Application
   # api
   before do
     content_type :json
+    response['Access-Control-Allow-Origin'] = '*'
   end
 
   get '/door/:id' do
