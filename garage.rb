@@ -84,7 +84,7 @@ module Garage
   end
 
   class PositionValidator
-    VALID_POSITIONS = ['open','closed']
+    VALID_POSITIONS = %w(open closed)
 
     def initialize(position)
       @position = position
