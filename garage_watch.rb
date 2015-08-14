@@ -5,6 +5,7 @@ require_relative './garage'
 
 
 class GarageWatch < Sinatra::Application
+  # api
   before do
     content_type :json
   end
@@ -25,5 +26,13 @@ class GarageWatch < Sinatra::Application
     rescue JSON::ParserError => e
       [ 400 ]
     end
+  end
+
+  # front end
+  set :public_folder, '../garage-fe/'
+
+  get '/' do
+    content_type :html
+    send_file File.join %w(.. garage-fe index.html)
   end
 end
