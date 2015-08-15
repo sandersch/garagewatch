@@ -11,6 +11,11 @@ class GarageWatch < Sinatra::Application
   end
 
   get '/doors/:id' do
+    begin
+      { door: Garage.door(params[:id])}.to_json
+    rescue KeyError
+      [ 404 ]
+    end
   end
 
   get '/doors' do
