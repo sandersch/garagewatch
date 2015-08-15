@@ -3,7 +3,6 @@
 require 'sinatra'
 require_relative './garage'
 
-
 class GarageWatch < Sinatra::Application
   # api
   before do
@@ -11,19 +10,18 @@ class GarageWatch < Sinatra::Application
     response['Access-Control-Allow-Origin'] = '*'
   end
 
-  get '/door/:id' do
-    Garage.door(params[:id]).to_json
+  get '/doors/:id' do
   end
 
   get '/doors' do
     Garage.status.to_json
   end
 
-  put '/door/:id' do
+  put '/doors/:id' do
     begin
       payload = JSON.parse(request.body.read)
 
-      Garage.door(params[:id]).update(payload['position'])
+      Garage.door(params[:id]).update(payload.fetch('door', {})['status'])
     rescue JSON::ParserError => e
       [ 400 ]
     end
