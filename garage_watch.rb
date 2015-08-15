@@ -25,8 +25,9 @@ class GarageWatch < Sinatra::Application
   put '/doors/:id' do
     begin
       payload = JSON.parse(request.body.read)
+      payload = payload['door'] if payload['door']
 
-      Garage.door(params[:id]).update(payload.fetch('door', {})['status'])
+      Garage.door(params[:id]).update(payload['status'])
     rescue JSON::ParserError => e
       [ 400 ]
     rescue KeyError
