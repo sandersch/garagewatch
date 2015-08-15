@@ -29,6 +29,8 @@ class GarageWatch < Sinatra::Application
       Garage.door(params[:id]).update(payload.fetch('door', {})['status'])
     rescue JSON::ParserError => e
       [ 400 ]
+    rescue KeyError
+      [ 404 ]
     end
   end
 
