@@ -58,7 +58,7 @@ module Garage
 
     def update(position)
       if (validator = PositionValidator.new position).valid?
-        [ 200, to_hash.merge(status: set(position)).to_json ]
+        [ 200, { door: to_hash.merge(status: set(position))}.to_json ]
       else
         [ 422, { errors: validator.errors }.to_json ]
       end
